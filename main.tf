@@ -149,9 +149,9 @@ resource "aws_internet_gateway" "app_gw" {
   vpc_id = aws_vpc.app_vpc.id
 }
 
-data "local_file" "my_pem" {
-  filename = "/Users/kmonteiro/.ssh/kevin-eng54.pem"
-}
+# data "local_file" "my_pem" {
+#   filename = "/Users/kmonteiro/.ssh/kevin-eng54.pem"
+# }
 
 # launch ec2
 resource "aws_instance" "app_instance" {
@@ -167,22 +167,13 @@ resource "aws_instance" "app_instance" {
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "sudo systemctl start nginx",
-      "sudo unlink /etc/nginx/sites-enabled/default",
-      "sudo cp /home/ubuntu/reverse-proxy.conf /etc/nginx/sites-available/reverse-proxy.conf",
-      "ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/reverse-proxy.conf",
-      "sudo systemctl reload-or-restart nginx",
-      "cd /home/ubuntu/app",
-      "sudo npm install",
-      "npm start &"
-    ]
+    script = "provision.sh"
 
     connection {
       type = "ssh"
       user = "ubuntu"
       host = self.public_ip
-      private_key = data.local_file.my_pem.content
+      private_key = file("/Users/kmonteiro/.ssh/kevin-eng54.pem")
     }
   }
 }
