@@ -1,5 +1,5 @@
 # Two Tier Structure Node Mongo Terraform
-This repository contains orchestration instructions for a two-tier (public and private) infrastructure. We create 2 instances for the node app and the database seperately in two different subnets and we also create the surrounding structure inside the vpc. 
+This repository contains orchestration instructions for a two-tier (public and private) infrastructure. We create 2 instances for the node app and the database seperately in two different subnets and we also create the surrounding structure inside the vpc.
 
 # Prerequisites
 I have run the cookbook using the below prerequisites:
@@ -9,7 +9,7 @@ I have run the cookbook using the below prerequisites:
 - Terraform v0.12.24
 
 # Setup
-
+- Set your names and AMI IDs in the main variables.tf file (directory: ./variables.tf)
 
 # How To
 Clone the repository, navigate into the nodeTerraform directory and follow the below steps.
