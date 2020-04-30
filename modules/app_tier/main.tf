@@ -48,9 +48,18 @@ resource "aws_default_network_acl" "def_nacl" {
     protocol = "tcp"
     rule_no = 140
     action = "allow"
-    cidr_block = var.vpc_cb
+    cidr_block = "10.0.2.0/24"
     from_port = 27017
     to_port = 27017
+  }
+
+  ingress {
+    protocol = "tcp"
+    rule_no = 150
+    action = "allow"
+    cidr_block = "10.0.2.0/24"
+    from_port = 22
+    to_port = 22
   }
 
   egress {
@@ -93,7 +102,7 @@ resource "aws_default_network_acl" "def_nacl" {
     protocol = "tcp"
     rule_no = 140
     action = "allow"
-    cidr_block = var.vpc_cb
+    cidr_block = "10.0.2.0/24"
     from_port = 27017
     to_port = 27017
   }
@@ -102,7 +111,7 @@ resource "aws_default_network_acl" "def_nacl" {
     protocol = "tcp"
     rule_no = 150
     action = "allow"
-    cidr_block = var.vpc_cb
+    cidr_block = "10.0.2.0/24"
     from_port = 22
     to_port = 22
   }
@@ -195,6 +204,13 @@ resource "aws_security_group" "home_access" {
     to_port = 65535
     protocol = "tcp"
     cidr_blocks = ["10.0.2.0/24"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = -1
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {

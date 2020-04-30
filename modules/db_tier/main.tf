@@ -50,9 +50,18 @@ resource "aws_network_acl" "priv_nacl" {
     protocol = "tcp"
     rule_no = 140
     action = "allow"
-    cidr_block = var.vpc_cb
+    cidr_block = "10.0.1.0/24"
     from_port = 27017
     to_port = 27017
+  }
+
+  ingress {
+    protocol = "tcp"
+    rule_no = 150
+    action = "allow"
+    cidr_block = "10.0.1.0/24"
+    from_port = 22
+    to_port = 22
   }
 
   egress {
@@ -95,7 +104,7 @@ resource "aws_network_acl" "priv_nacl" {
     protocol = "tcp"
     rule_no = 140
     action = "allow"
-    cidr_block = var.vpc_cb
+    cidr_block = "10.0.1.0/24"
     from_port = 27017
     to_port = 27017
   }
@@ -104,7 +113,7 @@ resource "aws_network_acl" "priv_nacl" {
     protocol = "tcp"
     rule_no = 150
     action = "allow"
-    cidr_block = var.vpc_cb
+    cidr_block = "10.0.1.0/24"
     from_port = 22
     to_port = 22
   }
@@ -124,22 +133,23 @@ resource "aws_route_table_association" "link_assoc" {
   route_table_id = aws_route_table.private_rt.id
 }
 
+data "template_file" "app_provs" {
+  template = file("./templates/db/provision.sh.tpl")
+}
+
 # launch ec2
-resource "aws_instance" "app_instance" {
+resource "aws_instance" "db_instance" {
   ami = var.ami_id
   instance_type = "t2.micro"
   associate_public_ip_address = true
   subnet_id = aws_subnet.priv_subnet.id
   security_groups = [aws_security_group.db_access.id]
   key_name = "kevin-eng54"
+  user_data = data.template_file.app_provs.rendered
 
   tags = {
     Name = "${var.name}"
   }
-}
-
-output "instance_ip_addr" {
-  value = aws_instance.app_instance.private_ip
 }
 
 resource "aws_security_group" "db_access" {
@@ -166,6 +176,13 @@ resource "aws_security_group" "db_access" {
     to_port = 65535
     protocol = "tcp"
     cidr_blocks = ["10.0.1.0/24"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = -1
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
